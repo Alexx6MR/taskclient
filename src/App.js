@@ -1,24 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import {useState,useEffect} from 'react'
+import {Route, Redirect } from "wouter";
+
+
+import LoginPage from './pages/login'
+import RegisterPage from './pages/register'
+import Dashboard from './pages/dashboard'
+
 
 function App() {
+  const [user,setUser] = useState()
+
+  useEffect( ()=>{
+    const loggedUser = window.localStorage.getItem("loggedUser")
+    if(loggedUser){
+      const {data} = JSON.parse(loggedUser)
+      setUser(data)
+    
+    }
+  },[] )
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <div>
+
+  
+
+    {/* <Route path="/users/:name">
+      {(params) => <div>Hello, {params.name}!</div>}
+    </Route> */}
+
+
+    <Route path="/">
+      <LoginPage/>
+    </Route>
+
+    <Route path="/register" component={RegisterPage} />
+
+    <Route path="/dashboard" component={Dashboard} />
+
+  
+
+    
+    
+
+  </div>
   );
 }
 
