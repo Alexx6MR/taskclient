@@ -7,20 +7,26 @@ import TaskService from '../services/task.service'
 import Notify from '../utils/Notify'
 
 
-export default function CreateTaskModal({setIsOpen, isOpen}) {
+export default function CreateTaskModal({setIsOpen, isOpen, token, setRefresh}) {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   function closeModal() {
     setIsOpen(false)
+    setRefresh(true)
   }
 
-
   const onSubmit = async data => {
-    
-    const res = await TaskService.createTask(data)
-    reset()
-    Notify.SuccessAlert(res.message)
-    setIsOpen(false)
+    try {
+      const res = await TaskService.createTask(data, token)
+      Notify.SuccessAlert(res.message)
+      reset()
+      setIsOpen(false)
+      setRefresh(true)
+    } catch (err) {
+      console.log(err.message)
+    }
+   
+ 
   
   };
 

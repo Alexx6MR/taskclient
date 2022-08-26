@@ -1,12 +1,8 @@
 
 const baseURL = "http://localhost:3001/api/task"
 
-const loggedUser = window.localStorage.getItem("loggedUser")
-const {data} = JSON.parse(loggedUser)
-const {token} = data
-
     
-const getAllTask = async () => {
+const getAllTask = async (token) => {
     try {
         const config = {
             method: 'GET',
@@ -26,17 +22,9 @@ const getAllTask = async () => {
    
 }
 
-const getOneTask = async (taskID) => {
-    try {
-        const res = fetch(`${baseURL}/${taskID}`);
-        return res.json()
-    } catch (err) {
-        console.error("cannot create task", err.message);
-    }
-    
-}
 
-const createTask = async (task) => {
+
+const createTask = async (task, token) => {
     try {
         const config = {
             method: 'POST',
@@ -56,7 +44,7 @@ const createTask = async (task) => {
     }
 } 
 
-const updateTask = async (task, taskID) => {
+const updateTask = async (task, taskID, token) => {
     try {
         const config = {
             method: 'PATCH',
@@ -76,7 +64,7 @@ const updateTask = async (task, taskID) => {
     }
 } 
 
-const deleteTask = async (taskID) => {
+const deleteTask = async (taskID, token) => {
     try {
         const config = {
             method: 'DELETE',
@@ -95,6 +83,6 @@ const deleteTask = async (taskID) => {
     }
 } 
 
-const taskService = {getAllTask, getOneTask, createTask, updateTask, deleteTask}
+const taskService = {getAllTask, createTask, updateTask, deleteTask}
 
 export default taskService

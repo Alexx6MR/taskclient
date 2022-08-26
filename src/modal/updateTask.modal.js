@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import TaskService from '../services/task.service'
 import Notify from '../utils/Notify'
 
-export default function UpdateTaskModal({setIsOpen, isOpen, task}) {
+export default function UpdateTaskModal({setIsOpen, isOpen, task, token, setRefresh}) {
     const { register, handleSubmit, reset} = useForm();
 
   function closeModal() {
@@ -15,10 +15,11 @@ export default function UpdateTaskModal({setIsOpen, isOpen, task}) {
 
   const onSubmit = async data => {
     
-    const res = await TaskService.updateTask(data, task._id)
+    const res = await TaskService.updateTask(data, task._id, token)
     reset()
     setIsOpen(false)
     Notify.SuccessAlert(res.message)
+    setRefresh(true)
     
   };
 

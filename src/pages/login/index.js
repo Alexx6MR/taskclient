@@ -15,21 +15,17 @@ export default function LoginPage() {
   
   const onSubmit = async data => {
     const user = await authService.Login(data)
-    const LoggedUser = window.localStorage.getItem("loggedUser")
-    const UserToken = JSON.parse(LoggedUser)
-    
-    if(UserToken){
-      
-  
+
+    if(user){
       Notify.SuccessAlert("Login success")
-      window.localStorage.setItem("loggedUser", JSON.stringify(user)) 
-      reset()
+      window.sessionStorage.setItem("loggedUser", JSON.stringify(user.data))
+     
       setLocation("/dashboard");
-      
-      
     }else{
       console.log("no hay token", user)
     }
+     
+    
 
   };
 

@@ -1,25 +1,34 @@
-import { Link, Redirect } from "wouter";
+import { Link, useLocation } from "wouter";
 
 import { useForm } from "react-hook-form";
 import authService from '../../services/auth.service';
+import Notify from '../../utils/Notify'
+import { Toaster } from 'react-hot-toast';
+
 
 export default function RegisterPage() {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
-  
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const [location, setLocation] = useLocation()
+
+
+
   const onSubmit = async data => {
 
-    const json = await authService.Register(data)
-   
-    if(json.data){
-      Redirect('/dashboard')
-      reset()
+    const res = await authService.Register(data)
+    
+    if(res.data){
+      Notify.SuccessAlert("Register success")
     }else{
-      console.log("no hay token", json)
+      console.log("no hay token", res.data)
     }
+
+    window.localStorage.setItem("loggedUser", JSON.stringify(res.data)) 
+      setLocation("/dashboard");
   }
 
   return (
     <>
+    <Toaster />
 
       <div className="h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-r from-secundary-light to-primary-light">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -28,7 +37,7 @@ export default function RegisterPage() {
             src="https://tailwindui.com/img/logos/workflow-mark.svg?color=teal&shade=500"
             alt="Workflow"
           />
-          <h2 className="mt-6 text-center text-3xl tracking-tight font-bold text-gray-900">Sign in to your account</h2>
+          <h2 className="mt-6 text-center text-3xl tracking-tight font-bold text-gray-900">Sign up your account</h2>
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

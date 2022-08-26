@@ -2,7 +2,7 @@
 import { TrashIcon, PencilAltIcon } from '@heroicons/react/outline'
 import taskService from '../services/task.service'
 import Notify from '../utils/Notify'
-export default function taskCard({task, setTaskID, openModal}){
+export default function taskCard({task, setTaskID, openModal, token, setRefresh}){
 
   const UpdateTask = () => {
       setTaskID(task)
@@ -11,8 +11,9 @@ export default function taskCard({task, setTaskID, openModal}){
 
 
   const DeleteTask = async () => {
-    const res = await taskService.deleteTask(task._id)
+    const res = await taskService.deleteTask(task._id, token)
     Notify.SuccessAlert(res.message)
+    setRefresh(true)
   }
 
 

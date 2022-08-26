@@ -1,5 +1,5 @@
-import {useState,useEffect} from 'react'
-import {Route, Redirect } from "wouter";
+import {useEffect} from 'react'
+import {Route} from "wouter";
 
 
 import LoginPage from './pages/login'
@@ -8,16 +8,16 @@ import Dashboard from './pages/dashboard'
 
 
 function App() {
-  const [user,setUser] = useState()
+  
 
-  useEffect( ()=>{
-    const loggedUser = window.localStorage.getItem("loggedUser")
-    if(loggedUser){
-      const {data} = JSON.parse(loggedUser)
-      setUser(data)
+  // useEffect( ()=>{
+  //   const loggedUser = window.localStorage.getItem("loggedUser")
+  //   if(loggedUser){
+  //     const {data} = JSON.parse(loggedUser)
+
     
-    }
-  },[] )
+  //   }
+  // },[] )
 
   return (
     <div>
@@ -36,11 +36,6 @@ function App() {
     <Route path="/register" component={RegisterPage} />
 
     <Route path="/dashboard" component={Dashboard} />
-
-  
-
-    
-    
 
   </div>
   );

@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from 'react-hot-toast';
@@ -15,45 +15,61 @@ import UpdateTaskModal from '../../modal/updateTask.modal'
 
 export default function Dashboard() {
   const [loggedUser, setLoggerUser] = useState()
-  const [tasks, setTasks] = useState()
+  const [userToken, setUserToken] = useState()
+  const [tasks, setTasks] = useState([])
+
   let [isCreateTaskOpen, setCreateTaskOpen] = useState(false)
   let [isUpdateTaskOpen, setUpdateTaskOpen] = useState(false)
   let [oneTask, setOneTask] = useState()
-  const [location, setLocation] = useLocation();
-
+  const [_, setLocation] = useLocation();
+  
+  let [refresh, setRefresh] = useState(false)
    
-  useEffect( ()=>{
+  useEffect(  ()=>{
+    
+    const loggedUserd = window.sessionStorage.getItem("loggedUser")
 
-    const GetTask = async () =>{
-      const res = await taskService.getAllTask()
-      if(res){
-        setTasks(res)
-      }else{
-        console.log("res is empty",res )
-        // window.localStorage.removeItem("loggedUser")
-        setLocation("/");
-      }
-    }
-
-    const loggedUser = window.localStorage.getItem("loggedUser")
-    if(loggedUser){
-      const {data} = JSON.parse(loggedUser)
-      const {user} = data
+    if(loggedUserd){
+      const data = JSON.parse(loggedUserd)
+      const {user, token} = data
+      setUserToken(token)
       setLoggerUser(user)
-
-      GetTask()
+      GetTask(token)
+    }else{
+      console.log("dont exist user", loggedUserd)
     }
-  },[tasks] )
+    
+    setRefresh(false)
+  },[refresh])
+
+
+  const GetTask = useCallback(  async (jwt) =>{
+    const res = await taskService.getAllTask(jwt)
+    setTasks(res)
+  })
 
   
+  const logout = () => {
+    window.sessionStorage.removeItem("loggedUser")
+    setLocation("/");
+  }
+
+
+
 
   return (
    <>
    <Toaster />
-   <CreateTaskModal isOpen={isCreateTaskOpen} setIsOpen={setCreateTaskOpen} />
-   <UpdateTaskModal isOpen={isUpdateTaskOpen} setIsOpen={setUpdateTaskOpen} task={oneTask} />
+   <CreateTaskModal isOpen={isCreateTaskOpen} setIsOpen={setCreateTaskOpen} token={userToken} setRefresh={setRefresh}/>
+   <UpdateTaskModal isOpen={isUpdateTaskOpen} setIsOpen={setUpdateTaskOpen} task={oneTask} token={userToken} setRefresh={setRefresh} />
    
     <main className="flex-1 bg-gradient-to-r from-purple-500 to-teal-600 h-screen">
+      <nav className='flex w-full h-20 justify-center'>
+        <button onClick={logout}
+        className='py px-4 font-semibold text-gray-50 bg-secundary-light hover:bg-secundary-dark rounded-lg mt-10'>
+          log out
+        </button>
+      </nav>
       <div className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold text-gray-900">Welcome User :  {loggedUser?.username} </h1>
@@ -62,36 +78,23 @@ export default function Dashboard() {
 
           <div className="py-4">
 
-            {!tasks
-            
-            ? <h1>Loading...</h1>
-            
-            : <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 <CreateTask 
                 activate={setCreateTaskOpen}
                 />
                 
-                <AnimatePresence exitBeforeEnter>
-                {tasks.map((person, index) => (
+                <AnimatePresence mode='wait'>
+                {tasks?.map((person, index) => (
                 
-                  <motion.div key={index}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}>
-                  <TaskCard 
-                  task={person} 
-                  key={person.title} 
-                  setTaskID={setOneTask} 
-                  openModal={setUpdateTaskOpen} 
-                  />
+                  <motion.div key={index} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                      <TaskCard task={person} key={person.title} setTaskID={setOneTask} openModal={setUpdateTaskOpen} token={userToken} setRefresh={setRefresh}/>
                   </motion.div>
                   
                 ))}
                 </AnimatePresence>
 
               </ul>
-            }
+        
            
           </div> 
 
